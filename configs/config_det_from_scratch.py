@@ -37,7 +37,7 @@ task_specific_coco_dataset_config = {
 def get_config(config_str=None):
   """config_str is either empty or contains task,architecture variants."""
 
-  task_variant = 'object_detection'
+  task_variant = 'object_detection@coco/2017_object_detection'
   encoder_variant = 'resnet'                 # Set model architecture.
   image_size = [1333, 1333]                          # Set image size.
 
