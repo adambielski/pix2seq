@@ -171,6 +171,9 @@ class Dataset(abc.ABC):
   def num_eval_examples(self):
     """Number of eval examples."""
 
+import resource
+low, high = resource.getrlimit(resource.RLIMIT_NOFILE)
+resource.setrlimit(resource.RLIMIT_NOFILE, (high, high))
 
 class TFDSDataset(Dataset):
   """A dataset created from a TFDS dataset.
