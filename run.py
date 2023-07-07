@@ -35,14 +35,14 @@ from metrics import coco_metrics  # pylint: disable=unused-import
 from models import ar_model  # pylint: disable=unused-import
 from models import image_ar_model  # pylint: disable=unused-import
 from models import image_diffusion_model  # pylint: disable=unused-import
-from models import latent_diffusion_model  # pylint: disable=unused-import
+# from models import latent_diffusion_model  # pylint: disable=unused-import
 from models import video_diffusion_model  # pylint: disable=unused-import
 from models import image_discrete_diffusion_model  # pylint: disable=unused-import
 from models import model as model_lib
 from models import panoptic_diffusion  # pylint: disable=unused-import
 # pylint: disable=unused-import
 from tasks import captioning
-from tasks import image_generation
+# from tasks import image_generation
 from tasks import instance_segmentation
 from tasks import keypoint_detection
 from tasks import object_detection
