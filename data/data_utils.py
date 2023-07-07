@@ -17,7 +17,7 @@
 
 import copy
 import functools
-from typing import Any, List, Optional, Sequence, Tuple
+from typing import Any, List, Optional, Sequence, Tuple, Dict
 
 from absl import logging
 import ml_collections
@@ -614,7 +614,7 @@ def crop_deprecated(features, labels, region,
   return features, labels
 
 
-def crop(example: dict[str, tf.Tensor],
+def crop(example: Dict[str, tf.Tensor],
          region: Tuple[Any, Any, Any, Any],
          input_keys: List[str],
          object_coordinate_keys: Optional[List[str]]):

@@ -18,7 +18,7 @@
 import abc
 import copy
 import numpy as np
-
+from typing import Dict
 import ml_collections
 import registry
 import utils
@@ -40,7 +40,7 @@ class Transform(object):
     self.config = config
 
   @abc.abstractmethod
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     """Implement this function to perform example-level processing."""
 
 
@@ -53,7 +53,7 @@ class CopyFields(Transform):
     outputs: names of the new features.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     for i, o in zip(self.config.inputs, self.config.outputs):
       example[o] = copy.copy(example[i])
     return example
@@ -69,7 +69,7 @@ class RecordOriginalImageSize(Transform):
       Defaults to 'orig_image_size'.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     image_key = self.config.get('image_key', 'image')
     orig_image_size_key = self.config.get('original_image_size_key',
                                           DEFAULT_ORIG_IMAGE_SIZE_KEY)
@@ -85,7 +85,7 @@ class ConvertImageDtypeFloat32(Transform):
     inputs: names of applicable fields in the example.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     for k in self.config.inputs:
       if example[k].dtype != tf.float32:
@@ -105,7 +105,7 @@ class ResizeImage(Transform):
     preserve_aspect_ratio: Optional[List[bool]]. Defaults to True.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     num_inputs = len(self.config.inputs)
     resize_methods = self.config.get('resize_method', ['bilinear'] * num_inputs)
@@ -133,7 +133,7 @@ class ScaleJitter(Transform):
     antialias: Optional[List[bool]]. Defaults to False.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     target_height, target_width = self.config.target_size
     min_scale, max_scale = self.config.min_scale, self.config.max_scale
@@ -172,7 +172,7 @@ class FixedSizeCrop(Transform):
       features that describe objects, e.g. 'bbox' for object detection.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     target_height, target_width = self.config.target_size
     input_size = tf.shape(example[self.config.inputs[0]])[:2]
@@ -203,7 +203,7 @@ class RandomHorizontalFlip(Transform):
     polygon_keys: optional. Names of polygon fields.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     inputs = {k: example[k] for k in self.config.inputs}
     boxes = {k: example[k] for k in self.config.get('bbox_keys', [])}
@@ -238,7 +238,7 @@ class RandomColorJitter(Transform):
     clip_by_value: optional tuple of float (min, max). Default is (0., 1.).
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     if self.config.get('color_jitter_strength', 0) > 0:
       clip_min, clip_max = self.config.get('clip_by_value', (0., 1.))
@@ -262,7 +262,7 @@ class FilterInvalidObjects(Transform):
       filtered out.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     bbox = example[self.config.get('bbox_key', DEFAULT_BBOX_KEY)]
     box_valid = tf.logical_and(bbox[:, 2] > bbox[:, 0], bbox[:, 3] > bbox[:, 1])
@@ -286,7 +286,7 @@ class ReorderObjectInstances(Transform):
       used for 'area' and 'dist2ori' methods.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     if self.config.get('bbox_key', DEFAULT_BBOX_KEY) in example:
       bbox = example[self.config.get('bbox_key', DEFAULT_BBOX_KEY)]
@@ -332,7 +332,7 @@ class InjectNoiseBbox(Transform):
     bbox_label_key: optional name of the bbox label field. Defaults to 'label'.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     bbox_key = self.config.get('bbox_key', DEFAULT_BBOX_KEY)
     bbox_label_key = self.config.get('bbox_label_key', 'label')
@@ -365,7 +365,7 @@ class PadImageToMaxSize(Transform):
       features that describe objects, e.g. 'bbox' for object detection.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     num_inputs = len(self.config.inputs)
     backgrnd_val = self.config.get('background_val', [0.3] * num_inputs)
@@ -405,7 +405,7 @@ class TruncateOrPadToMaxInstances(Transform):
     max_instances: positive `int` number for truncation or padding.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     max_instances = self.config.max_instances
     for k in self.config.inputs:
@@ -423,7 +423,7 @@ class PreserveReservedTokens(Transform):
     points_orig_keys: names of original points features.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     for points, points_orig in zip(self.config.points_keys,
                                    self.config.points_orig_keys):
@@ -441,7 +441,7 @@ class TruncateOrPadToMaxFrames(Transform):
     max_num_frames: positive `int` number for truncation or padding.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     max_num_frames = self.config.max_num_frames
     pad_frames = tf.maximum(0, max_num_frames - example['num_frames'])
@@ -463,7 +463,7 @@ class ByteEncodeAndPad(Transform):
     max_len: positive `int` number for truncation or padding.
   """
 
-  def process_example(self, example: dict[str, tf.Tensor]):
+  def process_example(self, example: Dict[str, tf.Tensor]):
     example = copy.copy(example)
     max_len = self.config.max_len
     def to_bytes(x):
