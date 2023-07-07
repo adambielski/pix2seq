@@ -113,7 +113,7 @@ def get_config(config_str=None):
       ),
 
       optimization=D(
-          optimizer='adamw',
+          optimizer='adamw_legacy',
           learning_rate=3e-3,
           end_lr_factor=0.01,
           warmup_epochs=10,

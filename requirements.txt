@@ -1,9 +1,9 @@
-tensorflow==2.12.*
+tensorflow==2.11.*
 ml-collections
 matplotlib
 tensorflow-datasets
 tensorflow-addons
-tensorflow-text==2.12.*
+tensorflow-text==2.11.*
 pycocotools
 scikit-image
 einops
