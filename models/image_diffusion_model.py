@@ -18,6 +18,7 @@
 import math
 import ml_collections
 
+from typing import Dict
 import utils
 from architectures.tape import ImageTapeDenoiser
 from architectures.transformers import FITDenoiser
@@ -235,7 +236,7 @@ class Model(tf.keras.models.Model):
   def compute_loss(self,
                    images: tf.Tensor,
                    noise: tf.Tensor,
-                   pred_dict: dict[str, tf.Tensor]) -> tf.Tensor:
+                   pred_dict: Dict[str, tf.Tensor]) -> tf.Tensor:
     config = self.config
     loss_type = config.get('loss_type', config.pred_type)
     if loss_type == 'x':
